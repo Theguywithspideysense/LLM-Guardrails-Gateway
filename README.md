@@ -6,7 +6,7 @@ A local LLM security gateway that inspects requests, applies guardrail policies,
 
 `Python` · `FastAPI` · `Ollama` · `SlowAPI` · `HTML / CSS / JavaScript`
 
-![LLM Guardrails Gateway security console showing request metrics, risk levels, and nine security layers](docs/images/security-console.png)
+![LLM Guardrails Gateway security console showing request metrics, risk levels, and nine security layers](images/security-console.png)
 
 [How it works](#how-it-works) · [Security layers](#security-layers) · [Demo](#demo-walkthrough) · [Quick start](#quick-start) · [API](#api) · [Project structure](#project-structure)
 
@@ -152,7 +152,7 @@ Enter a prompt or choose a preset, then select **Analyze & send**. The console s
 - The decision is **Request allowed**, with stage **complete**.
 - The generated answer appears below the decision and can be copied.
 
-![Allowed request with all nine checks passed and the model answer displayed](docs/images/safe-request-allowed.png)
+![Allowed request with all nine checks passed and the model answer displayed](images/safe-request-allowed.png)
 
 ### 3. Block personal data
 
@@ -160,7 +160,7 @@ Try a demonstration address such as `Please contact demo@example.com about the p
 
 In the captured email test, the **Personal data** card turns red and the request is blocked at the **input** stage with **20/100 — Low** risk. The semantic and output checks are skipped; **6/9 checks** ran. This demonstrates policy enforcement before answer generation.
 
-![Personal-data detection blocks the request at input despite a low risk score](docs/images/personal-data-blocked.png)
+![Personal-data detection blocks the request at input despite a low risk score](images/personal-data-blocked.png)
 
 ### 4. Block injection and prompt extraction
 
@@ -168,7 +168,7 @@ In the captured email test, the **Personal data** card turns red and the request
 
 Both **Prompt injection** and **Prompt extraction** are detected. The critical risk band lights up at **100/100**, and the gateway blocks the request before answer generation. The semantic and output checks are skipped.
 
-![Prompt injection and prompt extraction detected with a critical risk score and blocked decision](docs/images/prompt-injection-blocked.png)
+![Prompt injection and prompt extraction detected with a critical risk score and blocked decision](images/prompt-injection-blocked.png)
 
 ### Review request history
 
