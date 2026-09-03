@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Inspect prompts and model answers through your local LLM security gateway.">
+  <title>LLM Guardrails Gateway</title>
+  <link rel="icon" href="assets/shield.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/styles.css">
+  <script src="assets/app.js" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="header">
+      <div class="brand"><img src="assets/shield.svg" width="44" height="44" alt="">
+        <div><h1>LLM Guardrails Gateway</h1><p>Inspect the prompt. Protect the response.</p></div>
+      </div>
+      <div class="header-links"><span id="connection" class="connection">Connecting</span><a href="/docs" target="_blank" rel="noopener">API docs ↗</a></div>
+    </header>
+    <nav class="tabs" aria-label="Workspace">
+      <button class="tab active" data-tab="console" aria-pressed="true">Security console</button>
+      <button class="tab" data-tab="history" aria-pressed="false">Request history <span id="historyCount">0</span></button>
+      <button class="tab" data-tab="policies" aria-pressed="false">Policies</button>
+    </nav>
+    <main>
+      <section id="consolePanel" class="panel">
+        <div class="intro"><div><p class="eyebrow">LOCAL MODEL · LAYERED CHECKS</p><h2>Every request, inspected.</h2><p class="muted">See which checks ran and how the gateway handled your request.</p></div><div class="model-pill"><span class="muted">OLLAMA MODEL</span><strong id="model">qwen2.5-coder:7b</strong><small id="modelStatus">Checking availability…</small></div></div>
+        <div class="stats">
+          <article><span>Requests completed</span><strong id="totalRequests">0</strong><small>This server session</small></article>
+          <article><span>Requests blocked</span><strong id="blockedRequests">0</strong><small>Input or output stopped</small></article>
+          <article><span>Last risk score</span><strong><b id="riskScore">0</b><em>/100</em></strong><small id="currentRisk">LOW</small></article>
+          <article><span>Last latency</span><strong id="latency">—</strong><small><span id="failedRequests">0</span> failed requests</small></article>
+        </div>
+        <div class="section-label"><h3>Risk levels</h3><span>Critical risk always blocks</span></div>
+        <div class="risk-levels">
+          <div class="risk-card low" data-risk="LOW"><i></i><strong>Low</strong><span>0–29</span></div>
+          <div class="risk-card medium" data-risk="MEDIUM"><i></i><strong>Medium</strong><span>30–59</span></div>
+          <div class="risk-card high" data-risk="HIGH"><i></i><strong>High</strong><span>60–79</span></div>
+          <div class="risk-card critical" data-risk="CRITICAL"><i></i><strong>Critical</strong><span>80–100</span></div>
+        </div>
+        <div class="work-grid">
+          <section class="surface composer">
+            <div class="section-label"><h3>Try a prompt</h3><span>01 / INPUT</span></div>
+            <div class="examples" aria-label="Example prompts"><button data-example="safe">Safe prompt</button><button data-example="pii">Personal data</button><button data-example="injection">Prompt injection</button></div>
+            <form id="promptForm">
+              <label for="promptInput">Message to the model</label>
+              <textarea id="promptInput" rows="6" placeholder="Explain Python decorators with a simple example." required></textarea>
+              <div class="input-meta"><span id="characterCount">0 / 8,000 characters</span><span>Ctrl / ⌘ + Enter to send</span></div>
+              <div class="actions"><button id="sendButton" class="primary" type="submit">Analyze &amp; send <span aria-hidden="true">↗</span></button><button id="clearButton" class="secondary" type="button">Clear</button></div>
+            </form>
+            <p class="footnote">Detected sensitive values are masked in request history. Model answers appear only after output checks.</p>
+          </section>
+          <section class="surface layers"><div class="section-label"><h3>Security layers</h3><span id="layerSummary">Waiting for a request</span></div><div id="guardGrid" class="guard-grid"></div><p class="footnote">Red = detected · Green = passed · Gray = skipped or waiting</p></section>
+        </div>
+        <section class="surface result" id="resultSection" aria-live="polite" aria-busy="false">
+          <div class="result-heading"><div><p class="eyebrow">02 / GATEWAY DECISION</p><h3 id="requestStatus">Ready when you are</h3></div><span id="resultBadge" class="badge">WAITING</span></div>
+          <p id="resultMessage" class="muted">Send a prompt to view its security checks and the model’s answer.</p>
+          <dl class="result-meta"><div><dt>Detected layers</dt><dd id="breachedSecurity">—</dd></div><div><dt>Risk</dt><dd id="resultRisk">—</dd></div><div><dt>Stage</dt><dd id="resultStage">—</dd></div><div><dt>Latency</dt><dd id="resultLatency">—</dd></div></dl>
+          <div id="answerSection" hidden><div class="answer-heading"><h4>Model answer</h4><button id="copyAnswer" class="secondary">Copy answer</button></div><pre id="modelAnswer"></pre></div>
+        </section>
+      </section>
+      <section id="historyPanel" class="panel" hidden>
+        <div class="intro"><div><p class="eyebrow">REQUEST TIMELINE</p><h2>A clearer audit trail.</h2><p class="muted">The latest 100 completed requests. Resets when the server restarts.</p></div><button class="secondary" id="refreshHistory">Refresh</button></div>
+        <div class="history-toolbar"><label for="historySearch" class="sr-only">Search request history</label><input id="historySearch" type="search" placeholder="Search prompts or detected layers…"><label for="historyFilter" class="sr-only">Filter by decision</label><select id="historyFilter"><option value="all">All decisions</option><option value="block">Blocked</option><option value="allow">Allowed</option><option value="redact">Redacted</option><option value="warn">Warning</option><option value="error">Failed</option></select></div>
+        <div class="surface history-list" id="historyList" aria-live="polite"><p class="empty">No requests yet. Try a prompt in the security console.</p></div>
+        <p class="footnote">Format: prompt : detected layers · risk · decision. Previews mask recognized PII and secrets; use synthetic data for demonstrations.</p>
+      </section>
+      <section id="policiesPanel" class="panel" hidden>
+        <div class="intro"><div><p class="eyebrow">GATEWAY CONFIGURATION</p><h2>Explicit rules. Visible decisions.</h2><p class="muted">The default action is block. Risk scores of 80 or more always stop a request.</p></div></div>
+        <div class="surface policy-wrap"><table><thead><tr><th scope="col">Security layer</th><th scope="col">Current action</th><th scope="col">Supported actions</th></tr></thead><tbody id="policyRows"></tbody></table></div>
+        <p class="footnote" id="policyNote">Loading policies…</p>
+      </section>
+    </main>
+    <footer><span>FastAPI + Ollama</span><span>Local development gateway · Heuristic checks can miss threats</span></footer>
+    <p class="sr-only" id="announcement" role="status"></p>
+  </div>
+</body>
+</html>

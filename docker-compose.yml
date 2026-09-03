@@ -1,0 +1,19 @@
+services:
+  gateway:
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      OLLAMA_HOST: http://host.docker.internal:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-qwen2.5-coder:7b}
+      OLLAMA_TIMEOUT_SECONDS: ${OLLAMA_TIMEOUT_SECONDS:-120}
+      RATE_LIMIT: ${RATE_LIMIT:-10/minute}
+      SEMANTIC_ENABLED: ${SEMANTIC_ENABLED:-true}
+      GATEWAY_ADMIN_KEY: ${GATEWAY_ADMIN_KEY:-}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - gateway-logs:/app/logs
+    restart: unless-stopped
+volumes:
+  gateway-logs:

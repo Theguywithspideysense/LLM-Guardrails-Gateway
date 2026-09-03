@@ -1,0 +1,9 @@
+# Direct runtime versions used during review. Python 3.10 or newer.
+fastapi==0.141.1
+uvicorn==0.52.4
+pydantic==2.13.4
+httpx==0.28.1
+ollama==0.6.2
+python-dotenv==1.2.3
+slowapi==0.1.10
+limits==5.8.0
