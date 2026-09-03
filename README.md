@@ -141,7 +141,7 @@ These screenshots show the console from its initial state through an allowed ans
 
 Enter a prompt or choose a preset, then select **Analyze & send**. The console starts with the layer cards waiting for a request.
 
-![A safe Python-decorator prompt entered in the security console before submission](docs/images/prompt-ready.png)
+![A safe Python-decorator prompt entered in the security console before submission](images/prompt-ready.png)
 
 ### 2. Allow a safe request
 
